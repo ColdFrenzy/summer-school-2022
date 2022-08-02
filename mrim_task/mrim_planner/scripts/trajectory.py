@@ -162,9 +162,11 @@ class TrajectoryUtils():
         wps_interp = []
 
         idx = 0
+        heading_list = [w.heading for w in waypoints]
+        print("WAYPOINTS HEADING LIST: " + str(heading_list))
         while idx != (len(waypoints) - 1):
             g_from  = waypoints[idx]
-
+            starting_idx = idx
             # Find subtraj: sequence of poses (included) with defined heading
             subtraj = [g_from]
             for i in range(idx + 1, len(waypoints)):
@@ -192,16 +194,23 @@ class TrajectoryUtils():
             # interpolate headings
             for i in range(1, len(subtraj) - 1):
 
-                subtraj_0 = subtraj[i - 1].point
-                subtraj_1 = subtraj[i].point
+                subtraj_0 = subtraj[i - 1].point # first point with a valid heading of the subtrajectory
+                subtraj_1 = subtraj[i].point # last point with a valid heading of the subtrajectory
 
                 # [STUDENTS TODO, COMPULSORY] Implement heading interpolation here
                 # Tips:
                 #  - interpolate the heading linearly (create a function of distance between two points of the subpath)
                 #  - do not forget to wrap angle to <-pi, pi) (see/use wrapAngle() in utils.py)
 
+                # LINEAR INTERPOLATION
+                # subtraj_d_hdg = wrapAngle(subtraj[-1].heading - subtraj[0].heading)
+                subtraj_d_hdg = subtraj[-1].heading - subtraj[0].heading
+                d_hdg_single = subtraj_d_hdg/len(subtraj)
+                waypoints[starting_idx+i].heading  = waypoints[starting_idx+(i-1)].heading + d_hdg_single
+                print("Heading of point " + str(starting_idx+i) + " is: " + str(waypoints[starting_idx+i].heading))
+
                 # [STUDENTS TODO] Change variable 'hdg_interp', nothing else
-                hdg_interp = waypoints[0].heading
+                hdg_interp = waypoints[starting_idx+i].heading
 
                 # replace heading
                 hdg_from   = hdg_interp
